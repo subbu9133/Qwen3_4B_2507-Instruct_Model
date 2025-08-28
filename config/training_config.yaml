@@ -1,0 +1,42 @@
+# Qwen3-4B Content Moderation Fine-tuning Configuration
+model:
+  name: "Qwen/Qwen3-4B-Instruct"  # Corrected to Qwen3-4B
+  max_length: 2048
+  trust_remote_code: true
+
+training:
+  learning_rate: 2e-5
+  batch_size: 2  # Reduced for 4B model
+  gradient_accumulation_steps: 16  # Increased to maintain effective batch size
+  num_epochs: 3
+  warmup_steps: 100
+  weight_decay: 0.01
+  max_grad_norm: 1.0
+  
+  # LoRA Configuration optimized for Qwen3-4B
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.1
+    target_modules: ["q_proj", "v_proj", "k_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+
+data:
+  train_file: "data/processed/train.jsonl"
+  validation_file: "data/processed/validation.jsonl"
+  max_samples: 50000
+  
+  # Safety categories
+  safety_categories:
+    - "violence"
+    - "hate_speech"
+    - "sexual_content"
+    - "self_harm"
+    - "illegal_activities"
+    - "misinformation"
+    - "privacy_violation"
+    - "harassment"
+
+output_dir: "models/final/qwen3-4b-content-moderation"
+logging_steps: 100
+save_steps: 1000
+eval_steps: 500
